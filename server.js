@@ -38,7 +38,9 @@ io.on('connection', socket => {
         io.emit('message','someone left the chat');
     });
 
-
+    // listen the chatMessage and emit to all users
+    socket.on('chatMessage', (msg) => {
+        io.emit('message', msg);
+    });
 
 });
-
