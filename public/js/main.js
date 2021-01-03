@@ -6,6 +6,9 @@ socket.on('message', message => {
 
     // this function is defined below. used for printing chat msg.
     outputMessage(message);
+
+    // scroll to the bottom
+    document.querySelector('.messages').scrollTop = document.querySelector('.messages').scrollHeight;
 });
 
 
@@ -28,5 +31,6 @@ chatForm.addEventListener('submit', (e) => {
 
 // defination of outputMessage
 function outputMessage(message){
-    document.getElementById('showChatMessage').innerHTML += `${message}<br>`;
+    //document.getElementById('showChatMessage').innerHTML += `${message}<br>`;
+    document.querySelector('.messages').innerHTML += `${message}<br>`;
 }
