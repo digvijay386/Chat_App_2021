@@ -20,32 +20,56 @@ app.use(express.static(path.join(__dirname,'public')));
 // adding message.js from utils
 const formatMessage = require('./utils/message');
 
+// adding users,js from utils
+const {userJoin, getCurrentUser, userleave, getRoomUsers} = require('./utils/users');
+
 
 
 // adding socket.io
 const socketio = require('socket.io');
+const { join } = require('path');
 // run when client connects
 const io = socketio(server);
 io.on('connection', socket => {
     //console.log(`new ws connection on...`);
 
-    // only for the connected user
-    socket.emit('message', formatMessage('Bot','Welcome to the Chat !!!'));
+    // catching client's displayname and room
+    socket.on('joinRoom',({displayname, room})=>{
 
-    // broadcast to all except the connected user when someone connects
-    socket.broadcast.emit('message', formatMessage('Bot','New User has joined the Chat !'));
+        const user = userJoin(socket.id, displayname, room);
+
+        socket.join(user.room);
+
+
+        // only for the connected user
+        socket.emit('message', formatMessage('Bot','Welcome to the Chat !!!'));
+
+        // broadcast to all except the connected user when someone connects
+        socket.broadcast
+        .to(user.room)
+        .emit('message', formatMessage('Bot',`${user.displayname} has joined the Chat !`));
+
+
+    });
+
 
     // broadcast to all user
     //io.emit();
 
-    // when someone disconnects
-    socket.on('disconnect',() => {
-        io.emit('message',formatMessage('Bot','Someone left the Chat :('));
+
+    // listen the chatMessage and emit to all users in the room
+    socket.on('chatMessage', (msg) => {
+        const user = getCurrentUser(socket.id);
+        io.to(user.room).emit('message', formatMessage(user.displayname,msg));
     });
 
-    // listen the chatMessage and emit to all users
-    socket.on('chatMessage', (msg) => {
-        io.emit('message', formatMessage('USER',msg));
+
+    // when someone disconnects
+    socket.on('disconnect',() => {
+        const user = userleave(socket.id);
+        if(user){
+            io.to(user.room).emit('message',formatMessage('Bot',`${user.displayname} left the Chat. :(`));
+        }
     });
 
 });

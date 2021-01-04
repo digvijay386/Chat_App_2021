@@ -1,5 +1,13 @@
+// getting query info from qs functionalities
+const {displayname, room} = Qs.parse(location.search, {
+    ignoreQueryPrefix: true
+});
+
 
 const socket = io();
+ 
+// sending displayname and room of user to server
+socket.emit('joinRoom',{displayname, room});
 
 socket.on('message', message => {
     console.log(message);
