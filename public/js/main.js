@@ -26,11 +26,15 @@ chatForm.addEventListener('submit', (e) => {
     // emiting msg to the server
     socket.emit('chatMessage',msg);
 
+    // empty the msg input after sending the msg
+    e.target.elements.messagebox.value = '';
+    e.target.elements.messagebox.focus();
+
 });
 
 
 // defination of outputMessage
 function outputMessage(message){
     //document.getElementById('showChatMessage').innerHTML += `${message}<br>`;
-    document.querySelector('.messages').innerHTML += `${message}<br>`;
+    document.querySelector('.messages').innerHTML += `<div class='messages'><b>${message.username} ${message.time} :</b> ${message.text}</div>`;
 }

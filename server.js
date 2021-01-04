@@ -17,6 +17,11 @@ const path = require('path');
 app.use(express.static(path.join(__dirname,'public')));
 
 
+// adding message.js from utils
+const formatMessage = require('./utils/message');
+
+
+
 // adding socket.io
 const socketio = require('socket.io');
 // run when client connects
@@ -25,22 +30,22 @@ io.on('connection', socket => {
     //console.log(`new ws connection on...`);
 
     // only for the connected user
-    socket.emit('message', 'welcome to chatapp');
+    socket.emit('message', formatMessage('Bot','Welcome to the Chat !!!'));
 
     // broadcast to all except the connected user when someone connects
-    socket.broadcast.emit('message', 'new user joined');
+    socket.broadcast.emit('message', formatMessage('Bot','New User has joined the Chat !'));
 
     // broadcast to all user
     //io.emit();
 
     // when someone disconnects
     socket.on('disconnect',() => {
-        io.emit('message','someone left the chat');
+        io.emit('message',formatMessage('Bot','Someone left the Chat :('));
     });
 
     // listen the chatMessage and emit to all users
     socket.on('chatMessage', (msg) => {
-        io.emit('message', msg);
+        io.emit('message', formatMessage('USER',msg));
     });
 
 });
